@@ -1,0 +1,96 @@
+import { Component } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+
+@Component({
+  selector: 'app-productdetails',
+  templateUrl: './productdetails.component.html',
+  styleUrls: ['./productdetails.component.css']
+})
+export class ProductdetailsComponent {
+  constructor(private activatedRoute:ActivatedRoute,private router:Router){}
+  id:string;
+  description:string;
+  price:number;
+  ngOnInit(){
+   this.id=this.activatedRoute.snapshot.paramMap.get('id');
+  //  this.activatedRoute.queryParamMap.subscribe(param=>{
+  //   this.description=param.get('description'),
+  //   this.price=+param.get('price')
+  //  })
+
+  this.description=this.activatedRoute.snapshot.queryParamMap.get('description');
+  this.price=+this.activatedRoute.snapshot.queryParamMap.get('price');
+  }
+  closeModal(){
+ this.router.navigate(['/productlist']);
+  }
+
+}
+
+<div class="modal">
+    <h1>Product Details</h1>
+    <h2>Product ID: {{id}} </h2>
+    Description: {{description}}
+    <h3>Price: {{price}}</h3>
+    <button (click)="closeModal()" >Close</button>
+
+</div>
+
+<h1>Product Product List</h1>
+<div class="container">
+    <ul>
+        <li *ngFor="let product of products;let i=index"  class="product-item">
+            <h1>{{product.name}}</h1>
+            <p>{{product.description}}</p>
+            <button (click)="goToDetails(product)" >View Details</button>
+        </li>
+    </ul>
+
+</div>
+
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { PRODUCTS } from 'src/products';
+
+@Component({
+  selector: 'app-productlist',
+  templateUrl: './productlist.component.html',
+  styleUrls: ['./productlist.component.css']
+})
+export class ProductlistComponent {
+  products=[...PRODUCTS];
+  constructor(private route:Router){ }
+
+  goToDetails(product){
+    this.route.navigate(['/productdetails',product.id],
+    {
+      queryParams:{
+        description:product.description,
+        price:product.price
+      }
+    })
+    
+  }
+
+}
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { PracticeComponent } from './practice/practice.component';
+import { AppComponent } from './app.component';
+import { ProductlistComponent } from './productlist/productlist.component';
+import { ProductdetailsComponent } from './productdetails/productdetails.component';
+
+const routes: Routes = [
+ 
+    {path:'student',component:PracticeComponent},
+    {path:'productlist',component:ProductlistComponent},
+    {path:'productdetails/:id',component:ProductdetailsComponent}
+
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
