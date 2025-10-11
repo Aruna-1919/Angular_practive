@@ -1,0 +1,110 @@
+import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { meals } from 'src/meals';
+@Component({
+  selector: 'app-plandetails',
+  templateUrl: './plandetails.component.html',
+  styleUrls: ['./plandetails.component.css']
+})
+export class PlandetailsComponent {
+  constructor(private activatedRouter:ActivatedRoute){}
+  meals=[...meals];
+  mealId:number;
+  meal:any;
+  ngOnInit(){
+    this.mealId=+this.activatedRouter.snapshot.paramMap.get('id');
+    this.getMealById(this.mealId);
+   
+  }
+  getMealById(id:number){ 
+    this.meal=meals.find(m=>m.id==id);
+    
+  
+   }
+
+}
+
+---
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { meals } from 'src/meals';
+
+@Component({
+  selector: 'app-dietplan',
+  templateUrl: './dietplan.component.html',
+  styleUrls: ['./dietplan.component.css']
+})
+export class DietplanComponent {
+  constructor(private router:Router){}
+  meals=[...meals];
+  viewMealDetails(mealId:number){
+  const meal=meals.find(m=>m.id==mealId);
+  this.router.navigate(['/plandetail',mealId],{
+    
+  })
+
+
+  }
+
+}
+----
+<div class="container">
+    <h1>Meal Details</h1>
+    <h2>{{meal.name}} </h2>
+    <p>{{meal.descrption}}</p>
+    <p>{{meal.calories}} </p>
+    <p>{{meal.protein}} </p>
+
+</div>
+---
+import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { meals } from 'src/meals';
+@Component({
+  selector: 'app-plandetails',
+  templateUrl: './plandetails.component.html',
+  styleUrls: ['./plandetails.component.css']
+})
+export class PlandetailsComponent {
+  constructor(private activatedRouter:ActivatedRoute){}
+  meals=[...meals];
+  mealId:number;
+  meal:any;
+  ngOnInit(){
+    this.mealId=+this.activatedRouter.snapshot.paramMap.get('id');
+    this.getMealById(this.mealId);
+   
+  }
+  getMealById(id:number){ 
+    this.meal=meals.find(m=>m.id==id);
+    
+  
+   }
+
+}
+----
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { DietplanComponent } from './dietplan/dietplan.component';
+import { PlandetailsComponent } from './plandetails/plandetails.component';
+
+const routes: Routes = [
+  {path:'dietplan',component:DietplanComponent},
+  {path:'plandetail/:id',component:PlandetailsComponent}
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+
+----
+
+
+<div class="container">
+  <h1>My Diet Plan</h1>
+  <h2>Your personalized diet plan</h2> 
+  <a [routerLink]="['dietplan']">Today Meat Plan</a>
+</div>
+<router-outlet></router-outlet>
