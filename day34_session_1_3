@@ -1,0 +1,98 @@
+<div class="container">
+    
+    <h1>Prime Books</h1>
+   
+    <ul>
+        <li class="book-item" *ngFor="let book of books">
+            <button (click)="viewBookDetails(book.id)"><h2>{{book.title}}</h2></button>
+        
+        </li>
+    </ul> 
+
+</div>
+---
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { books } from 'src/books';
+
+@Component({
+  selector: 'app-booklist',
+  templateUrl: './booklist.component.html',
+  styleUrls: ['./booklist.component.css']
+})
+export class BooklistComponent {
+  constructor(private router:Router){}
+  books=[...books]
+  book:any;
+
+  viewBookDetails(id:number){
+    this.book=books.find(m=>m.id==id);
+    
+    
+    this.router.navigate(['/bookview',+id])
+
+  }
+
+}
+--
+<div class="book-details">
+
+<h2>{{book?.title}}</h2>
+<p>{{book?.author}} </p>
+<p>{{book?.genre}} </p>
+<p>{{book?.year}} </p> 
+<p>{{book?.pages}} </p>
+<button  routerLink="/booklist">Back to list</button></div>
+----
+import { Component } from '@angular/core';
+import { ActivatedRoute, Route, Router } from '@angular/router';
+import { books } from 'src/books';
+
+@Component({
+  selector: 'app-bookview',
+  templateUrl: './bookview.component.html',
+  styleUrls: ['./bookview.component.css']
+})
+export class BookviewComponent {
+  constructor(private activatedRoute:ActivatedRoute,private router:Router){}
+  book:any;
+ bookId;
+  books=[...books]
+ 
+  ngOnInit(){
+    
+    //this.bookId=this.activatedRoute.snapshot.paramMap.get('id');
+    this.activatedRoute.params.subscribe(params => {
+      this.bookId = +params['id'];
+      this.book = this.books.find(b => b.id === this.bookId);
+    });
+    this.book=books.find(m=>m.id==this.bookId);
+  
+  }
+ 
+
+}
+---
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { BooklistComponent } from './booklist/booklist.component';
+import { BookviewComponent } from './bookview/bookview.component';
+
+const routes: Routes = [
+  
+  {path:'booklist',component:BooklistComponent},
+  {path:'bookview/:id',component:BookviewComponent}
+
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+
+--
+
+<a [routerLink]="['/booklist']" >Hello</a>
+
+<router-outlet></router-outlet>dat3
