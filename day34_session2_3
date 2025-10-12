@@ -1,0 +1,72 @@
+<h1>Color Picker</h1>
+<h1>Pick a color</h1>
+<input type="color" [(ngModel)]="selectedColor" (change)="onColorChange()"/>
+<h1>selected Color</h1>
+<div class="selected-color-box" [style.backgroundColor]="selectedColor"></div>
+--
+.selected-color-box{
+    height: 100px;
+    width: 100px;
+}
+--
+
+import { Component, EventEmitter, Output } from '@angular/core';
+
+@Component({
+  selector: 'app-color-picker',
+  templateUrl: './color-picker.component.html',
+  styleUrls: ['./color-picker.component.css']
+})
+export class ColorPickerComponent {
+  color="#ff0000";
+  selectedColor="#ff0000";
+ 
+  @Output() colorSelected=new EventEmitter<string>();
+  onColorChange(){
+  this.colorSelected.emit(this.selectedColor);
+  }
+}
+--
+<h1>Color Viewer</h1> 
+<div [style.backgroundColor]="receivedColor"  class="color-box" >Color received from the ColorPicker component</div>  
+--
+.color-box{
+    height: 200px;
+    width: 200px;
+    background-color:#ff0000;
+}
+---
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-color-viewer',
+  templateUrl: './color-viewer.component.html',
+  styleUrls: ['./color-viewer.component.css']
+})
+export class ColorViewerComponent {
+  color="#ff0000";
+  @Input() receivedColor="#ff0000";
+  constructor(){
+    this.receivedColor="#ff0000";
+  }
+
+}
+---
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  title = 'angularapp';
+  receivedColor="ff0000";
+
+  selectedColor(color){
+    this.receivedColor=color;
+
+  }
+ 
+}
+
