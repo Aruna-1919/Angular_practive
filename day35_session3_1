@@ -1,0 +1,130 @@
+<div class="form-container">
+    <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+      <h1>Registration Form</h1>
+  
+      <label class="form-label">Name:*</label>
+      <input formControlName="name" />
+      <div *ngIf="registrationForm.get('name')?.invalid && registrationForm.get('name')?.touched">
+        <small>Name is required.</small>
+      </div>
+  
+      <label class="form-label">Age:*</label>
+      <input formControlName="age" type="number" />
+      <div *ngIf="registrationForm.get('age')?.invalid && registrationForm.get('age')?.touched">
+        <small>Age must be between 5 and 25.</small>
+      </div>
+  
+      <label class="form-label">Grade:*</label>
+      <input formControlName="grade" />
+      <div *ngIf="registrationForm.get('grade')?.invalid && registrationForm.get('grade')?.touched">
+        <small>Grade is required.</small>
+      </div>
+  
+      <label class="form-label">Gender:*</label>
+      <select formControlName="gender">
+        <option value="">Select</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+      <div *ngIf="registrationForm.get('gender')?.invalid && registrationForm.get('gender')?.touched">
+        <small>Gender is required.</small>
+      </div>
+  
+      <label class="form-label">Email:*</label>
+      <input formControlName="email" type="email" />
+      <div *ngIf="registrationForm.get('email')?.invalid && registrationForm.get('email')?.touched">
+        <small>Valid email is required.</small>
+      </div>
+  
+      <label class="form-label">Phone:*</label>
+      <input formControlName="phone" />
+      <div *ngIf="registrationForm.get('phone')?.invalid && registrationForm.get('phone')?.touched">
+        <small>Phone must be 10 digits.</small>
+      </div>
+  
+      <label class="form-label">Sports*</label>
+      <div formGroupName="sports">
+        <div *ngFor="let sport of sportsList">
+          <label class="form-label">
+            <input type="checkbox" [formControlName]="sport" />
+            {{ sport }}
+          </label>
+        </div>
+      </div>
+  
+      <button type="submit" [disabled]="registrationForm.invalid">Submit</button>
+    </form>
+  </div>
+  
+   <div class="modal" *ngIf="submitted">
+    <div class="modal-content">
+      <h3>Registration Successful</h3>
+      <p><strong>*Name:</strong> {{ formData.name }}</p>
+      <p><strong>*Age:</strong> {{ formData.age }}</p>
+      <p><strong>*Grade:</strong> {{ formData.grade }}</p>
+      <p><strong>*Gender:</strong> {{ formData.gender }}</p>
+      <p><strong>*Email:</strong> {{ formData.email }}</p>
+      <p><strong>*Phone:</strong> {{ formData.phone }}</p>
+      <p><strong>*Sports:</strong> {{ formData.sports }}</p>
+      <button (click)="closeModal()">Close</button>
+    </div>
+  </div>
+  -----
+  import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+
+@Component({
+  selector: 'app-eventform',
+  templateUrl: './eventform.component.html',
+  styleUrls: ['./eventform.component.css']
+})
+export class EventformComponent implements OnInit {
+  registrationForm!: FormGroup;
+  submitted = false;
+  formData: any = {};
+  sportsList: string[] = ['Football', 'Basketball', 'Athletics', 'Tennis'];
+
+  constructor(private fb: FormBuilder) {}
+
+  ngOnInit(): void {
+    const sportsControls: { [key: string]: FormControl } = {};
+    this.sportsList.forEach(sport => {
+      sportsControls[sport] = new FormControl(true); 
+    });
+  
+    this.registrationForm = this.fb.group({
+      name: ['John Doe', Validators.required],
+      age: [20, [Validators.required, Validators.min(5), Validators.max(25)]],
+      grade: ['10th', Validators.required],
+      gender: ['Male', Validators.required],
+      email: ['john@example.com', [Validators.required, Validators.email]],
+      phone: ['1234567890', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      sports: this.fb.group(sportsControls)
+    });
+  }
+  
+  getSelectedSports(): string {
+    const selected = [];
+    const sportsGroup = this.registrationForm.get('sports')?.value;
+    for (const sport in sportsGroup) {
+      if (sportsGroup[sport]) {
+        selected.push(sport);
+      }
+    }
+    return selected.join(', ');
+  }
+
+  onSubmit(): void {
+    if (this.registrationForm.valid) {
+      this.submitted = true;
+      this.formData = {
+        ...this.registrationForm.value,
+        sports: this.getSelectedSports()
+      };
+      this.registrationForm.reset();
+    }
+  }
+
+  closeModal(): void {
+    this.submitted = false;
+  }}
