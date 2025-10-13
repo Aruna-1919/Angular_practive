@@ -1,0 +1,74 @@
+import { Component, ElementRef, ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
+
+@Component({
+  selector: 'app-registration-form',
+  templateUrl: './registration-form.component.html',
+  styleUrls: ['./registration-form.component.css']
+})
+export class RegistrationFormComponent {
+  isSubmitted:boolean=false;
+  passwordMismatch:boolean=false;
+  @ViewChild("registrationForm") registrationForm !:NgForm;
+ 
+
+
+  onSubmit(form: NgForm) {
+    const password = form.value.password;
+    const confirmPassword = form.value.confirmPassword;
+  
+    if (password !== confirmPassword) {
+      this.passwordMismatch = true;
+      this.isSubmitted = false;
+    } else {
+      this.passwordMismatch = false;
+      this.isSubmitted = true;
+    }
+  }
+
+}
+-----------------
+<h1>Registration Form</h1>
+
+<form #registrationForm="ngForm" (ngSubmit)="onSubmit(registrationForm)">
+  <!-- Name -->
+  <label for="name">Name</label>
+  <input type="text" id="name" name="name" ngModel required />
+  <div *ngIf="registrationForm.controls['name']?.touched && registrationForm.controls['name']?.invalid" class="error-message">
+    Name is required.
+  </div>
+
+  <!-- Email -->
+  <label for="email">Email</label>
+  <input type="email" id="email" name="email" ngModel required email />
+  <div *ngIf="registrationForm.controls['email']?.touched && registrationForm.controls['email']?.invalid" class="error-message">
+    Valid email is required.
+  </div>
+
+  <!-- Password -->
+  <label for="password">Password</label>
+  <input type="password" id="password" name="password" ngModel required />
+  <div *ngIf="registrationForm.submitted && registrationForm.controls['password']?.invalid" class="error-message">
+    Password is required.
+  </div>
+
+  <!-- Confirm Password -->
+  <label for="confirmPassword">Confirm Password</label>
+  <input type="text" id="confirmPassword" name="confirmPassword" ngModel required />
+  <div *ngIf="registrationForm.submitted && registrationForm.controls['confirmPassword']?.invalid" class="error-message">
+    Confirm Password is required
+  </div>
+
+  <!-- Password Mismatch -->
+  <div *ngIf="passwordMismatch" class="error-message">
+    Passwords do not match
+  </div>
+
+  <button type="submit" [disabled]="registrationForm.invalid">Register</button>
+</form>
+
+<!-- Success Message -->
+<div *ngIf="isSubmitted" class="success-message">
+  Registration successful!
+</div>
+----------------
