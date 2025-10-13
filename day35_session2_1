@@ -1,0 +1,91 @@
+
+<form #jobForm="ngForm" (ngSubmit)="onSubmit(jobForm)">
+    <h1>Job Registration Form</h1>
+    <label class="form-label">Name:</label>
+    <input type="text" name="name" ngModel required />
+ 
+    <label class="form-label">Age:</label>
+    <input type="number" name="age" ngModel required />
+ 
+    <label class="form-label">Gender:</label>
+    <select name="gender" ngModel required>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+      <option value="Other">Other</option>
+    </select>
+ 
+    <label class="form-label">Email:</label>
+    <input type="email" name="email" ngModel required />
+ 
+    <label class="form-label">Phone:</label>
+    <input type="tel" name="phone" ngModel required />
+ 
+    <label class="form-label">Job Position:</label>
+    <select name="jobPosition" ngModel required>
+      <option value="Developer">Developer</option>
+      <option value="Designer">Designer</option>
+      <option value="Manager">Manager</option>
+    </select>
+ 
+    <label class="form-label">Experience (in years):</label>
+    <select name="experience" ngModel required>
+      <option value="0-1">0-1</option>
+      <option value="2-4">2-4</option>
+      <option value="5+">5+</option>
+    </select>
+ 
+    <label class="form-label">Skills:</label>
+    <input type="text" name="skills" ngModel />
+ 
+    <label class="form-label">Education:</label>
+    <input type="text" name="education" ngModel />
+ 
+    <label class="form-label">Comments:</label>
+    <textarea name="comments" ngModel></textarea>
+ 
+    <button type="submit">Submit</button>
+  </form>
+ 
+  <!-- Modal -->
+  <div *ngIf="submitted" class="modal">
+    <div class="modal-content">
+      <h2>Job Application Submitted</h2>
+      <p><strong>Name:</strong> {{ formData.name }}</p>
+      <p><strong>Age:</strong> {{ formData.age }}</p>
+      <p><strong>Gender:</strong> {{ formData.gender }}</p>
+      <p><strong>Email:</strong> {{ formData.email }}</p>
+      <p><strong>Phone:</strong> {{ formData.phone }}</p>
+      <p><strong>Job Position:</strong> {{ formData.jobPosition }}</p>
+      <p><strong>Experience:</strong> {{ formData.experience }}</p>
+      <p><strong>Skills:</strong> {{ formData.skills }}</p>
+      <p><strong>Education:</strong> {{ formData.education }}</p>
+      <p><strong>Comments:</strong> {{ formData.comments }}</p>
+      <button (click)="closeModal()">Close</button>
+    </div>
+  </div>
+--------------
+import { Component, ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
+ 
+@Component({
+  selector: 'app-jobform',
+  templateUrl: './jobform.component.html',
+  styleUrls: ['./jobform.component.css']
+})
+export class JobformComponent {
+  submitted = false;
+  formData: any = {};
+ 
+  @ViewChild('jobForm') jobForm!: NgForm;
+ 
+  onSubmit(form: NgForm) {
+    this.submitted = true;
+    this.formData = form.value;
+   // console.log(this.jobForm);
+    this.jobForm.reset();
+  }
+ 
+  closeModal() {
+    this.submitted = false;
+  }
+}
