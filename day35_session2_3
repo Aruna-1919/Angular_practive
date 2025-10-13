@@ -1,0 +1,162 @@
+<h2>User Registration</h2>
+
+<form #registrationForm="ngForm" (ngSubmit)="onSubmit(registrationForm)">
+  <!-- First Name -->
+  <div>
+    <label for="firstName">Enter the First Name:</label>
+    <input
+      type="text"
+      id="firstName"
+      name="firstName"
+      [(ngModel)]="user.firstName"
+      required
+      minlength="6"
+      #firstName="ngModel"
+    />
+    <div *ngIf="firstName.invalid && firstName.touched" class="error-message">
+      <small *ngIf="firstName.errors?.['required']">First Name is required.</small>
+      <small *ngIf="firstName.errors?.['minlength']">Minimum 6 characters required.</small>
+    </div>
+  </div>
+
+  <!-- Last Name -->
+  <div>
+    <label for="lastName">Last Name</label>
+    <input
+      type="text"
+      id="lastName"
+      name="lastName"
+      [(ngModel)]="user.lastName"
+      required
+      minlength="6"
+      #lastName="ngModel"
+    />
+    <div *ngIf="lastName.invalid && lastName.touched"  class="error-message">
+      <small *ngIf="lastName.errors?.['required']">Last Name is required.</small>
+      <small *ngIf="lastName.errors?.['minlength']">Minimum 6 characters required.</small>
+    </div>
+  </div>
+
+  <!-- Mobile Number -->
+  <div>
+    <label for="mobileNumber">Mobile Number</label>
+    <input
+      type="text"
+      id="mobileNumber"
+      name="mobileNumber"
+      pattern="^[0-9]*$"
+      [(ngModel)]="user.mobileNumber"
+      required
+      #mobileNumber="ngModel"
+    />
+    <div *ngIf="mobileNumber.invalid && mobileNumber.touched"  class="error-message">
+      <small *ngIf="mobileNumber.errors?.['required']">Mobile Number is required.</small>
+      <small *ngIf="mobileNumber.errors?.['pattern']">Only digits allowed.</small>
+    </div>
+  </div>
+
+  <!-- Email -->
+  <div>
+    <label for="email">Email</label>
+    <input
+      type="email"
+      id="email"
+      name="email"
+      [(ngModel)]="user.email"
+      required
+      #email="ngModel"
+    />
+    <div *ngIf="email.invalid && email.touched"  class="error-message">
+      <small *ngIf="email.errors?.['required']">Email is required.</small>
+      <small *ngIf="email.errors?.['email']">Invalid email format.</small>
+    </div>
+  </div>
+
+  <!-- Password -->
+  <div>
+    <label for="password">Password</label>
+    <input
+      type="password"
+      id="password"
+      name="password"
+      [(ngModel)]="user.password"
+      required
+
+      pattern="^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$"
+      #password="ngModel"
+    />
+    <div *ngIf="password.invalid && password.touched"  class="error-message">
+      <small *ngIf="password.errors?.['required']">Password is required.</small>
+      <small *ngIf="password.errors?.['pattern']">
+        Must be at least 8 characters, include a number and a special character.
+      </small>
+    </div>
+  </div>
+
+  <!-- Confirm Password -->
+  <div>
+    <label for="confirmPassword">Confirm Password</label>
+    <input
+      type="password"
+      id="confirmPassword"
+      name="confirmPassword"
+      [(ngModel)]="user.confirmPassword"
+      required
+      #confirmPassword="ngModel"
+    />
+    <div *ngIf="confirmPassword.invalid && confirmPassword.touched"  class="error-message">
+      <small *ngIf="confirmPassword.errors?.['required']">Confirm Password is required.</small>
+    </div>
+    <div *ngIf="user.password !== user.confirmPassword && confirmPassword.touched">
+      <small>Passwords do not match.</small>
+    </div>
+  </div>
+
+  <!-- Buttons -->
+  <button type="submit" [disabled]="registrationForm.invalid || user.password !== user.confirmPassword">
+    Submit
+  </button>
+
+  <button type="button" (click)="resetForm(registrationForm)">Reset</button>
+  <div *ngIf="isFormSubmitted" [ngStyle]="{'color':isFormSubmitted?'green':'none'}">
+    Form submitted successfully!
+
+  </div>
+</form>
+-----------------------
+import { Component } from '@angular/core';
+import { NgForm } from '@angular/forms';
+
+@Component({
+  selector: 'app-registration',
+  templateUrl: './registration.component.html',
+  styleUrls: ['./registration.component.css']
+})
+export class RegistrationComponent {
+  user = {
+    firstName: '',
+    lastName: '',
+    mobileNumber: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  };
+
+  isFormSubmitted = false;
+
+  onSubmit(form: NgForm) {
+    if (form.valid && this.user.password === this.user.confirmPassword) {
+      this.isFormSubmitted = true;
+      console.log('Form Submitted', this.user);
+    }
+  }
+
+  resetForm(form: NgForm) {
+    form.resetForm();
+    this.isFormSubmitted = false;
+  }
+}
+-----------
+.error-message{
+    color:red;
+}
