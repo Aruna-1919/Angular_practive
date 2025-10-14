@@ -1,0 +1,98 @@
+<h2>Add Employee</h2>
+<input type="text" name="name" id="name" [(ngModel)]="name" #nameR="ngModel" ngModel required/>
+<small *ngIf="nameR.invalid && nameR.touched"> User name cannot be empty</small>
+<input type="text" name="role" id="role" [(ngModel)]="role" #roleR="ngModel" ngModel required/>
+<small *ngIf="roleR.invalid && roleR.touched"> role cannot be empty</small>
+<input type="text" name="location" id="location" [(ngModel)]="location" #locationR="ngModel" ngModel required/>
+<small *ngIf="locationR.invalid && locationR.touched">location cannot be empty</small>
+<button (click)="addEmployee()">Add Employee</button>
+-----
+import { Component } from '@angular/core';
+import { Employee } from '../model/employee.model';
+import {  Router } from '@angular/router';
+import { EmployeeService } from '../services/employee.service';
+
+@Component({
+  selector: 'app-add-employee',
+  templateUrl: './add-employee.component.html',
+  styleUrls: ['./add-employee.component.css']
+})
+export class AddEmployeeComponent {
+  name:string;
+  role:string;
+  location:string;
+  constructor(private router:Router,private employeeService:EmployeeService){
+
+  }
+  addEmployee(){
+    const newEmployee:Employee= 
+    {name:this.name,role:this.role,location:this.location};
+    this.employeeService.addEmployee(newEmployee);
+
+    this.router.navigate(['/employeelist']);
+
+  }
+
+}
+-----
+<h2>Employee List</h2>
+<ul *ngIf="employees.length>0 else elseBlock">
+    <li *ngFor="let employee of employees;let i=index">
+     {{employee.name}}-{{employee.role}}-{{employee.location}}
+     <button (click)="deleteEmployee(i)">Delete</button>
+</li>
+</ul> 
+<ng-template #elseBlock>
+    No employees added yet.
+</ng-template>
+------
+import { Component } from '@angular/core';
+import { Employee } from '../model/employee.model';
+import { EmployeeService } from '../services/employee.service';
+
+@Component({
+  selector: 'app-employee-list',
+  templateUrl: './employee-list.component.html',
+  styleUrls: ['./employee-list.component.css']
+})
+export class EmployeeListComponent {
+  employees:Employee[];
+  constructor(private employeeService:EmployeeService){
+    this.employees=employeeService.getEmployees();
+  }
+  deleteEmployee(index:number){
+    this.employeeService.deleteEmployee(index);
+    this.employees=this.employeeService.getEmployees();;
+  }
+  
+
+}
+------------
+export class Employee {
+    name:string;
+    role:string;
+    location:string
+    
+}
+-----------
+import { Injectable } from '@angular/core';
+import { Employee } from '../model/employee.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class EmployeeService {
+
+  constructor() { }
+  employees:Employee[]=[];
+  getEmployees(){
+    return this.employees;
+  }
+  addEmployee(employee:Employee){
+    this.employees.push(employee);
+
+  }
+  deleteEmployee(index:number){
+    this.employees.splice(index,1);
+  }
+}
