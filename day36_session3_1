@@ -1,0 +1,123 @@
+<input type="text" [(ngModel)]="newNote.title" placeholder="enter note title"/>
+<br><br>
+<textarea [(ngModel)]="newNote.content" placeholder="enter content"></textarea>
+<br>
+<br>
+<button (click)="addNote()">Submit</button>
+<br>
+<br>
+--------
+import { Component } from '@angular/core';
+import { NoteService } from '../services/note.service';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-addnote',
+  templateUrl: './addnote.component.html',
+  styleUrls: ['./addnote.component.css']
+})
+export class AddnoteComponent {
+  newNote:any={
+    id:null,
+    title:"",
+    content:""
+  }
+  constructor(private noteService:NoteService)//,private router:Router)
+  {}
+  ngOnInit(){
+
+  }
+  addNote(){
+    this.newNote.id=Date.now();
+    this.noteService.addNote(this.newNote);
+    this.newNote={
+      id:null,
+      title:"",
+      content:""
+    }
+  // this.router.navigate(['/listnotes']);
+
+  }
+
+}
+
+-------------
+<ul *ngIf="notes.length>0 else elseBlock">
+    <li *ngFor="let note of notes;let i=index">
+        {{note.title}}<br>
+        {{note.content}}<br>
+        <button (click)="updateNote(note)" >Update</button>
+        <button (click)="deleteNote(note.id)">Delete</button> 
+    </li>
+</ul>
+<ng-template #elseBlock>
+
+    No record is found.
+</ng-template>
+
+<!-- Update Overlay -->
+<div *ngIf="editNote"> 
+    <h2>Update Note</h2>
+    <input type="text" [(ngModel)]="editNote.title" placeholder="enter new title"/>
+    <textarea [(ngModel)]="editNote.content" placeholder="enter new Content"></textarea>
+    <button (click)="saveNote()" >Save</button>
+    <button (click)="cancelEdit()" >Cancel</button>
+</div>
+-----------
+import { Component } from '@angular/core';
+import { NoteService } from '../services/note.service';
+import { from } from 'rxjs';
+
+@Component({
+  selector: 'app-notelist',
+  templateUrl: './notelist.component.html',
+  styleUrls: ['./notelist.component.css']
+})
+export class NotelistComponent {
+  notes:any[]=[];
+  editNote:any=null;
+  constructor(private noteService:NoteService){}
+  ngOnInit(){
+    this.notes=this.noteService.getNotes();
+  }
+  deleteNote(id){
+    this.noteService.deleteNote(id);
+    this.notes=this.noteService.getNotes();
+  }
+  updateNote(note){
+    this.editNote={...note};
+
+  }
+  saveNote(){
+   this.noteService.updateNote(this.editNote);
+   this.notes=this.noteService.getNotes();
+   this.editNote=null;
+  }
+  cancelEdit(){
+    this.editNote=null;
+  }
+
+}
+---------------
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { AddnoteComponent } from './addnote/addnote.component';
+import { NotelistComponent } from './notelist/notelist.component';
+
+const routes: Routes = [
+  {path:'addnote',component:AddnoteComponent},
+  {path:'listnotes',component:NotelistComponent}
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+--------------------
+
+<a routerLink="/addnote">Add Note</a>
+<br>
+<a routerLink="/listnotes">List All Notes</a>
+<br>
+<router-outlet></router-outlet>
