@@ -1,0 +1,93 @@
+<div class="add-todo">
+    <input type="text" [(ngModel)]="newTodo.title" placeholder="enter task"/>
+    <input type="checkbox" value="completed" [(ngModel)]="newTodo.completed"/>
+    <button (click)="addTodo()">Add Todo</button>
+</div>
+------
+import { Component } from '@angular/core';
+import { TodoService } from '../services/todo.service';
+
+@Component({
+  selector: 'app-add-todo',
+  templateUrl: './add-todo.component.html',
+  styleUrls: ['./add-todo.component.css']
+})
+export class AddTodoComponent {
+  constructor(private todoservice:TodoService){}
+  newTodo:any={
+    title:"",
+    completed:false
+  }
+  addTodo(){
+    const newAdd={...this.newTodo,id:null}
+    this.todoservice.addTodo(newAdd);
+
+  }
+}
+---------------
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class TodoService {
+
+  constructor() { }
+  todos:any[]=[]
+  getTodos(){
+    return this.todos;
+  }
+  addTodo(todo){
+     todo.id=this.todos.length;
+     this.todos.push(todo);
+     //console.log(todo);
+  }
+  updateTodoStatus(id:number,completed:boolean){
+    const index=this.todos.findIndex(n=>n.id==id);
+    this.todos[index].completed=completed;
+  }
+  deleteTodo(id){
+    const index=this.todos.findIndex(n=>n.id==id);
+    this.todos.splice(index,1);
+  
+  }
+}
+---------------
+<div class="todo-item" *ngFor="let todo of todos">
+    <input type="checkbox" [(ngModel)]="todo.completed" (change)="updateTodoStatus(todo.id,todo.completed)"/>
+    <p [ngStyle]="{'text-decoration':todo.completed?'line-through':'none'}"> {{todo.title}} </p>
+    <button (click)="deleteTodo(todo.id)">Delete</button>
+</div>  
+------------
+import { Component } from '@angular/core';
+import { TodoService } from '../services/todo.service';
+
+
+@Component({
+  selector: 'app-todo-list',
+  templateUrl: './todo-list.component.html',
+  styleUrls: ['./todo-list.component.css']
+})
+export class TodoListComponent {
+  todo:any={
+    id:null,
+    titel:"",
+    completed:false
+  }
+  todos:any[]=[];
+  constructor(private todoService:TodoService){}
+  ngOnInit(){
+    this.todos=this.todoService.getTodos();
+  }
+  deleteTodo(id){
+    this.todoService.deleteTodo(id);
+    this.todos=this.todoService.getTodos();
+  }
+  updateTodoStatus(id,completed){
+    this.todoService.updateTodoStatus(id,completed);
+    this.todos=this.todoService.getTodos();
+  }
+
+
+}
+
