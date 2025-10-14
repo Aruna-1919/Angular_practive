@@ -1,0 +1,140 @@
+<h1>BlogApp</h1>
+<form #form="ngForm" (ngSubmit)="addBlog()">
+<input type="text" placeholder="enter title" [(ngModel)]="blog.title" name="title" id="title"/>
+<textarea placeholder="enter content" [(ngModel)]="blog.content" name="content" id="content"></textarea>
+<button type="submit">Add Blog</button>
+</form>
+------
+import { Component } from '@angular/core';
+import { NgForm } from '@angular/forms';
+import { BlogService } from '../services/blog.service';
+
+@Component({
+  selector: 'app-addblog',
+  templateUrl: './addblog.component.html',
+  styleUrls: ['./addblog.component.css']
+})
+export class AddblogComponent {
+  form!:NgForm;
+  
+  blog={
+    id:null,
+    title:"",
+    content:""
+  }
+  constructor(private blogService:BlogService){}
+  ngOnInit(){
+
+  }
+  addBlog(){
+  this.blog.id=Date.now();
+  this.blogService.addBlog(this.blog).subscribe(data=>{
+    this.blog=data;
+  });
+  //this.form.reset();
+  this.blog={
+    id:null,
+    title:"",
+    content:""
+
+  }
+  
+
+  }
+}
+-----
+<div *ngFor="let blog of blogs;let i=index">
+    {{blog.title}} {{blog.content}}
+    <button (click)="saveBlog()">Update</button>
+    <button (click)="deleteBlog(book.id)">Delete</button>
+    </div> 
+-----------------
+import { Component } from '@angular/core';
+import { BlogService } from '../services/blog.service';
+import { Observable } from 'rxjs';
+
+@Component({
+  selector: 'app-bloglist',
+  templateUrl: './bloglist.component.html',
+  styleUrls: ['./bloglist.component.css']
+})
+export class BloglistComponent {
+  constructor(private blogService:BlogService){} 
+  blogs:any[];
+  editBlog:any;
+  ngOnInit(){
+   this.getBlogs();
+
+  
+  }
+  getBlogs(){
+    this.blogService.getBlogs().subscribe(data=>
+      {
+        this.blogs=data;
+      });
+    
+  }
+  deleteBlog(id){
+    this.blogService.deleteBlog(id).subscribe(data=>{
+      this.getBlogs();
+    });
+
+  }
+  updateBlog(blog){
+    this.editBlog=blog;
+  }
+  saveBlog(){
+    this.blogService.updateBlog(this.editBlog.id,this.editBlog).subscribe(data=>{
+     this.getBlogs();
+    this.editBlog=null;
+    });
+    
+  }
+  cancelEdit(){
+    this.editBlog=null;
+  }
+
+
+}
+----------------------------------
+import { Injectable } from '@angular/core';
+import { Observable ,of} from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class BlogService { 
+
+
+  constructor() { }
+  blogs:any[]=[];
+  getBlogs():Observable<any>{
+    return of(this.blogs);   
+  }
+  addBlog(blog):Observable<any>{
+    this.blogs.push(blog);
+    return of(blog);
+
+  }
+  deleteBlog(id):Observable<any>{
+    for(let i=0;i<this.blogs.length;i++){
+      if(this.blogs[i].id==id){
+        this.blogs.splice(i,1);
+      }
+
+    }
+    return of({id:id});
+
+  }
+  updateBlog(id,blog):Observable<any>{
+    for(let i=0;i<this.blogs.length;i++){
+      if(this.blogs[i].id==id){
+        this.blogs[i]=blog;
+      }
+    }
+    return of(blog);
+
+
+  }
+
+}
