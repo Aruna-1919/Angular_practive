@@ -1,0 +1,154 @@
+<form [formGroup]="formSubmit" (ngSubmit)="onSubmit()">  
+<div class="container">
+
+
+    <label class="form-label">Name:</label>
+    <input type="text" formControlName="name" placeholder="Enter name"/>
+        <small *ngIf="formSubmit.get('name')?.invalid && formSubmit.get('name')?.touched">
+        User name can't be empty.
+        </small> 
+
+    <label class="form-label">Age:</label>
+    <input type="number" formControlName="age" placeholder="Enter age"/>
+     <small *ngIf="formSubmit.get('age')?.invalid && formSubmit.get('age')?.touched">
+        <small *ngIf="formSubmit.get('age')?.errors?.['required'] && formSubmit.get('age')?.touched">
+            Age  can't be empty.
+        </small> 
+        <small *ngIf="formSubmit.get('age')?.errors?.['min'] || formSubmit.get('age')?.errors?.['max']">
+            Age must be in range to min - max.
+        </small> 
+    </small>  
+
+    <label class="form-label">Profession:</label>
+    <select formControlName="profession">
+        <option value=''>Select</option>
+        <option value="Student">Student</option>
+        <option value="Working">Working</option>
+    </select>
+        <small *ngIf="formSubmit.get('profession')?.invalid && formSubmit.get('profession')?.touched">
+            Profession name can't be empty.
+        </small> 
+
+
+    <label class="form-label">Gender:</label>
+    <label><input type="radio" name="gender" formControlName="gender" value="male"/>Male</label>
+    <label><input type="radio" name="gender" formControlName="gender" value="female"/>Female</label>
+    <small *ngIf="formSubmit.get('gender')?.invalid && formSubmit.get('gender')?.touched">
+        Gender u should select.
+    </small> 
+
+    <label class="form-label">Habits:</label>
+    <div formGroupName="name">
+    <div *ngFor="let habit of habits">
+       <li><input type="checkbox" [formControl]="formSubmit.get('habits').get(habit)"/>{{habit}}</li> 
+    </div>
+</div>
+    <small *ngIf="formSubmit.get('habits')?.invalid && formSubmit.get('habits')?.touched">
+        Habits u should select.
+    </small> 
+
+    <label class="form-label">Password:</label>
+    <input type="password" formControlName="password" placeholder="Enter password"/>
+    <small *ngIf="formSubmit.get('password')?.errors?.['pattern'] && formSubmit.get('password')?.touched">
+        Password must contain atleast one special character,one digit.
+    </small>
+    <small *ngIf="formSubmit.get('password')?.errors?.['required'] && formSubmit.get('password')?.touched">
+       Password should not be empty.
+    </small> 
+
+    <label class="form-label">Confirm Password:</label>
+    <input type="password" formControlName="confirmpassword" placeholder="Confirm Password"/>
+    <small *ngIf="formSubmit.get('confirmpassword')?.errors?.['required'] && formSubmit.get('confirmpassword')?.touched">
+        Confirm Password should not be empty.
+     </small>
+     <small *ngIf="formSubmit.get('confirmpassword').value!=formSubmit.get('password').value && formSubmit.get('confirmpassword')?.touched">
+        Confirm Password must be equal to password.
+     </small>
+
+    <button type="submit" [disabled]="formSubmit.invalid">Submit</button> 
+
+    <button type="submit" (click)="closeModel()">Reset</button> 
+
+   
+</div>
+</form>
+
+ <!-- Result -->
+ <div class="result" *ngIf="isSubmitted">
+    <h1>Registration Successfull.</h1>
+    Name:{{formData.name}}
+    Age:{{formData.age}}
+    Profession:{{formData.profession}}
+    Gender:{{formData.gender}}
+    Habits:{{formData.habits}}
+ </div>
+
+
+---------------------------------------------
+import { Component } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+@Component({
+  selector: 'app-formab',
+  templateUrl: './formab.component.html',
+  styleUrls: ['./formab.component.css']
+})
+export class FormabComponent {
+  formSubmit!:FormGroup;
+  formData:any={};
+  isSubmitted:boolean=false;
+  habits:string[]=['Singing','Dancing','Playing'];
+  constructor(private fb:FormBuilder){}
+  pattern="^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*()]{8,}$";
+  ngOnInit(){
+    this.formSubmit=this.fb.group({
+      name:['',Validators.required],
+      age:['',[Validators.required,Validators.min(18),Validators.max(25)]],
+      profession:['',[Validators.required]],
+      gender:['',Validators.required],
+      habits:this.fb.group({
+        Singing:false,
+        Dancing:false,
+        Playing:false,
+
+      }),
+      password:['',[Validators.pattern(this.pattern),Validators.required]],
+      confirmpassword:['',Validators.required]
+    },{validators:this.passwordMismacher}
+    );
+  }
+  getHabitsAsString(){
+    const habits_list=this.formSubmit.get('habits')?.value;
+    return Object.keys(habits_list).filter(habit=>habits_list[habit]).join(", ");
+  }
+  onSubmit(){
+    if(this.formSubmit.valid){
+      this.isSubmitted=true;
+      this.formData={
+        ...this.formSubmit.value,
+        habits:this.getHabitsAsString()
+
+      }
+      this.formSubmit.reset();
+
+    }
+
+  }
+  closeModel(){
+    this.isSubmitted=false;
+  }
+
+  passwordMismacher(form:AbstractControl){
+    const password=form.get('password').value;
+    const confirmPassword=form.get('confirmpassword').value;
+    if(password!=confirmPassword){
+      form.get('confirmpassword').setErrors({mismatch:true});
+
+    }
+    else{
+      form.get('confirmpassword').setErrors(null);
+    }
+  }
+
+
+}
