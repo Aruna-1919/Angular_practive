@@ -1,0 +1,110 @@
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Task } from '../model/task.model';
+import {HttpClient} from '@angular/common/http';
+@Injectable({
+  providedIn: 'root'
+})
+export class TaskService {
+
+  constructor(private http:HttpClient) { }
+  apiUrl:string="https://ide-ceddcdabc336160542deeceafaaeebdone.premiumproject.examly.io/proxy/3001/tasks";
+  
+  getTasks():Observable<Task[]>{
+    return this.http.get<Task[]>(this.apiUrl);
+  }
+  addTask(task:Task):Observable<Task>{
+    return this.http.post<Task>(this.apiUrl,task);
+  }
+  updateTask(task:Task):Observable<Task>{
+    let u=`${this.apiUrl}/${task.id}`
+    return this.http.put<Task>(u,task);
+  }
+  deleteTask(taskId:number):Observable<void>{
+    return this.http.delete<void>(`${this.apiUrl}/${taskId}`);
+  }
+}
+
+------------------
+
+<h2>Task List</h2>
+<ul *ngFor="let task of tasks$|async"> 
+<li>{{task.title}}-{{task.description}} </li>
+<button (click)="deleteTask(task.id)" >Delete</button>
+<button (click)="editTask(task)">Edit</button>
+</ul>
+
+
+<form (ngSubmit)="addTask()">
+    <h2>Add Task</h2>
+    <label>Title: <input type="text" [(ngModel)]="newTask.title" id="title" name="title"></label>
+   <label>Description: <textarea [(ngModel)]="newTask.description" id="description" name="description"></textarea> </label>
+    <br>
+    <button type="submit">Add Task</button>
+</form>
+------------------
+import { Component } from '@angular/core';
+import { TaskService } from '../services/task.service';
+import { Observable } from 'rxjs';   
+import { Task } from '../model/task.model';
+
+@Component({
+  selector: 'app-task-list',
+  templateUrl: './task-list.component.html',
+  styleUrls: ['./task-list.component.css']
+})
+export class TaskListComponent {
+  constructor(private taskService:TaskService){}
+  tasks$:Observable<Task[]>;
+  selectedTask:Task=null;
+  newTask={
+    id:0,
+    title:"",
+    description:""
+  }
+  ngOnInit(){
+    this.tasks$=this.taskService.getTasks();
+  }
+  
+  loadTasks(){
+    this.tasks$=this.taskService.getTasks();
+  }
+  addTask(){
+    if(this.selectedTask){
+      this.taskService.updateTask(this.newTask).subscribe(()=>{
+        this.selectedTask=null;
+        this.newTask={
+          id:0,
+          title:"",
+          description:""
+        }
+        this.loadTasks();
+      });
+  
+    }
+    else{
+      this.taskService.addTask(this.newTask).subscribe(()=>{
+        this.selectedTask=null;
+        this.newTask={
+          id:0,
+          title:"",
+          description:""
+        }
+        this.loadTasks();
+      });
+    }
+   
+  }
+  deleteTask(taskId:number){
+    this.taskService.deleteTask(taskId).subscribe(()=>{});
+  }
+  editTask(task:Task){
+    this.selectedTask=task;
+    this.newTask={...task}; 
+
+  }
+   
+
+
+}
+--------------------------
