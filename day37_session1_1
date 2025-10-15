@@ -1,0 +1,122 @@
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { PatientService } from '../services/patient.service';
+import { Patient } from '../model/patient.model';
+import { Observable } from 'rxjs';
+
+@Component({
+  selector: 'app-add-patient',
+  templateUrl: './add-patient.component.html',
+  styleUrls: ['./add-patient.component.css']
+})
+export class AddPatientComponent implements OnInit{
+  
+  constructor(private fb:FormBuilder,private service:PatientService){
+    this.patientForm=this.fb.group({
+      name:['',Validators.required],
+      age:['',Validators.required],
+      gender:['',Validators.required],
+      bloodGroup:['',Validators.required],
+      medicalHistory:['',Validators.required]
+       
+     });
+  }
+  patientForm!:FormGroup;
+  
+  ngOnInit():void{
+    this.patientForm=this.fb.group({
+     name:['',Validators.required],
+     age:['',Validators.required],
+     gender:['',Validators.required],
+     bloodGroup:['',Validators.required],
+     medicalHistory:['',Validators.required]
+      
+    });
+  }
+
+  addNewPatient(){
+    
+    if(this.patientForm.invalid){
+      return;
+    }
+
+      else{
+        let patient:Patient = this.patientForm.value;
+    this.service.addPatient(patient).subscribe(data=>{
+      patient=data;
+    });
+  
+    }
+
+  }
+
+}
+------------
+export class Patient {
+    id?:number;
+    name:string;
+    age:number;
+    gender:string;
+    bloodGroup:string;
+    medicalHistory:string;
+}
+-----------------------------
+import { Component } from '@angular/core';
+import { Patient } from '../model/patient.model';
+import { PatientService } from '../services/patient.service';
+
+@Component({
+  selector: 'app-patient-list',
+  templateUrl: './patient-list.component.html',
+  styleUrls: ['./patient-list.component.css']
+})
+export class PatientListComponent {
+  patients:Patient[]=[];
+  constructor(private pattientservice:PatientService){}
+  ngOnInit(){
+     this.pattientservice.getPatients().subscribe(data=>{
+      this.patients=data;
+     });
+
+  }
+  deletePatient(patientId:number){
+    this.pattientservice.deletePatient(patientId).subscribe(data=>{
+
+    });
+
+  }
+  getPatients(){
+    this.pattientservice.getPatients().subscribe(data=>{
+      this.patients=data;
+     });
+
+  }
+
+}
+------------------------------------
+import { Injectable } from '@angular/core';
+import {Observable} from 'rxjs';                 
+
+import {HttpClient} from '@angular/common/http';
+import { Patient } from '../model/patient.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PatientService {
+
+  constructor(private http:HttpClient) { }
+  backendUrl:string="https://ide-ceddcdabc336132943aaeddbcbfbfone.premiumproject.examly.io/proxy/3001/patients"; 
+  getPatients():Observable<Patient[]>{
+    return this.http.get<Patient[]>(this.backendUrl); 
+  }
+  addPatient(patient:Patient):Observable<Patient>{
+    return this.http.post<Patient>(this.backendUrl,patient);     
+  }
+  deletePatient(patientId:number):Observable<void>{
+    return this.http.delete<void>(`${this.backendUrl}/${patientId}`);
+
+  }
+
+ 
+} 
