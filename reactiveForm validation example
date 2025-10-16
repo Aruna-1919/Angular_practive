@@ -11,7 +11,7 @@
     <label class="form-label">Age:</label>
     <input type="number" formControlName="age" placeholder="Enter age"/>
      <small *ngIf="formSubmit.get('age')?.invalid && formSubmit.get('age')?.touched">
-        <small *ngIf="formSubmit.get('age')?.errors?.['required'] && formSubmit.get('age')?.touched">
+        <small *ngIf="formSubmit.get('name')?.errors?.['required'] && formSubmit.get('age')?.touched">
             Age  can't be empty.
         </small> 
         <small *ngIf="formSubmit.get('age')?.errors?.['min'] || formSubmit.get('age')?.errors?.['max']">
@@ -117,6 +117,8 @@ export class FormabComponent {
     },{validators:this.passwordMismacher}
     );
   }
+
+
   getHabitsAsString(){
     const habits_list=this.formSubmit.get('habits')?.value;
     return Object.keys(habits_list).filter(habit=>habits_list[habit]).join(", ");
