@@ -1,7 +1,7 @@
 <form [formGroup]="formSubmit" (ngSubmit)="onSubmit()">  
 <div class="container">
 
-
+   
     <label class="form-label">Name:</label>
     <input type="text" formControlName="name" placeholder="Enter name"/>
         <small *ngIf="formSubmit.get('name')?.invalid && formSubmit.get('name')?.touched">
@@ -11,7 +11,7 @@
     <label class="form-label">Age:</label>
     <input type="number" formControlName="age" placeholder="Enter age"/>
      <small *ngIf="formSubmit.get('age')?.invalid && formSubmit.get('age')?.touched">
-        <small *ngIf="formSubmit.get('name')?.errors?.['required'] && formSubmit.get('age')?.touched">
+        <small *ngIf="formSubmit.get('age')?.errors?.['required'] && formSubmit.get('age')?.touched">
             Age  can't be empty.
         </small> 
         <small *ngIf="formSubmit.get('age')?.errors?.['min'] || formSubmit.get('age')?.errors?.['max']">
@@ -41,7 +41,7 @@
     <div formGroupName="name">
     <div *ngFor="let habit of habits">
        <li><input type="checkbox" [formControl]="formSubmit.get('habits').get(habit)"/>{{habit}}</li> 
-    </div>
+    </div>   
 </div>
     <small *ngIf="formSubmit.get('habits')?.invalid && formSubmit.get('habits')?.touched">
         Habits u should select.
